@@ -1,0 +1,12 @@
+namespace: shinysaana
+name: rlo
+version: 0.1.0
+readme: ./README.md
+authors:
+  - ShinySaana <shinysaana@gmail.com>
+description: Rich Live Output. 
+  A rich stdout callback plugin. 
+  Designed for humans, using modern terminals, 
+  with a focus on density of useful information.
+repository: https://github.com/ShinySaana/ansible-rich-live-output
+license_file: ./COPYING
