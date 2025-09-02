@@ -11,7 +11,8 @@ import time
 import rich
 import yaml
 
-sys.path.append(str(pathlib.Path(__file__).absolute().parent.parent))
+# Necessary to import the `rlo` package
+sys.path.append(str(pathlib.Path(__file__).absolute().parent.parent.parent))
 
 from rlo.transformers import init_transformer, get_transform_callback
 
@@ -572,6 +573,10 @@ class CallbackModule(CallbackBase):
 
             if potential_transformer_module == "":
                 potential_transformer_module = "rlo.transformers"
+            else:
+                # Allow users to import their own Transformer relative to the execution directory.
+                # I'm not aware of any better alternative?
+                sys.path.append(str(pathlib.Path("./").absolute()))
 
             self._transformer_user = init_transformer(potential_transformer_module, potential_transformer_name)
             self._transformer_user_callback = get_transform_callback(self._transformer_user)
