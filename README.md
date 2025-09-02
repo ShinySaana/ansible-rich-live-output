@@ -9,7 +9,7 @@ Designed for humans with modern terminals.
 - **Rich and dense**: Terminal real estate comes at a premium; each line of log is meaningful.
 - **Live output**: Know which tasks are currently running, and for how long.
 - **Safe**: Sanitize the output before it arrives to your terminal.
-- **Custom transformers**: Convert the output of your tasks before they're printed; ideal for censoring secrets. for example.
+- **Custom transformers**: Convert the output of your tasks before they're printed; ideal for censoring secrets, for example.
 
 ## Dependencies
 
@@ -25,7 +25,7 @@ TODO: How to enable/disable running tasks' timer (and why you may want to disabl
 TODO: How to configure theme  
 TODO: Complete reference of variables  
 
-## TODOs (in nor particular order):
+## TODOs (in no particular order):
 
 - Finish this README
 - Document rlo_cb more extensively
