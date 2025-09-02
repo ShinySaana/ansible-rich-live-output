@@ -11,10 +11,7 @@ import time
 import rich
 import yaml
 
-# Necessary to import the `rlo` package
-sys.path.append(str(pathlib.Path(__file__).absolute().parent.parent.parent))
-
-from rlo.transformers import init_transformer, get_transform_callback
+from ansible_collections.shinysaana.rlo.plugins.module_utils.transformers import init_transformer, get_transform_callback
 
 from ansible.executor.task_result import TaskResult
 from ansible.inventory.host import Host
@@ -154,7 +151,7 @@ def transform_dict(data, callback):
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = 'stdout'
-    CALLBACK_NAME = 'rlo'
+    CALLBACK_NAME = 'rlo_cb'
 
     SYMBOL_OK = "✔" # U+2714 - Heavy Check Mark
     SYMBOL_CHANGED = "⚙" # U+2699 - Gear 
@@ -170,9 +167,8 @@ class CallbackModule(CallbackBase):
         self._transformer_user = None
         self._transformer_user_callback = None
 
-        self._transformer_sanitizer = init_transformer("rlo.transformers.sanitizer", "Sanitizer")
+        self._transformer_sanitizer = init_transformer("ansible_collections.shinysaana.rlo.plugins.module_utils.transformers", "Sanitizer")
         self._transformer_sanitizer_callback = get_transform_callback(self._transformer_sanitizer)
-
 
         self._hosts = {}
         self._current_role = None
@@ -572,7 +568,7 @@ class CallbackModule(CallbackBase):
             potential_transformer_name = parts[1]
 
             if potential_transformer_module == "":
-                potential_transformer_module = "rlo.transformers"
+                potential_transformer_module = "ansible_collections.shinysaana.rlo.plugins.module_utils.transformers"
             else:
                 # Allow users to import their own Transformer relative to the execution directory.
                 # I'm not aware of any better alternative?
