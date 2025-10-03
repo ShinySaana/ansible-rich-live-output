@@ -476,9 +476,10 @@ class CallbackModule(CallbackBase):
 
         return comprehensive_result
 
-    # Returns a small object containing some information to debug a task
+    # Returns a small object containing some information to debug a task.
     # Expected to be printed for each and every task, regardless of its status (ok, changed, failed, etc) on a medium verbosity.
     # Only prints msg, stdout, stderr, and task vars.
+    # If the values are empty strings, they are omitted from the output.
     def _get_reduced_result_object(self, result, task):
         # Don't log a no_log task, unless we are verbose enough (-vvv)
         if task.no_log and not self._run_is_verbose(result, 2):
@@ -487,14 +488,14 @@ class CallbackModule(CallbackBase):
         reduced_result = {}
 
         for key in ["stdout", "stderr"]:
-            if key in result:
+            if key in result and result[key] != '':
                 reduced_result[key] = result[key]
 
-        # Specifically ignore loop's `msg` in a reduced result, otherwise print it.
-        if "msg" in result and result["msg"] != "All items completed":
+        # Specifically ignore loop's top level `msg` in a reduced result, otherwise print it.
+        if "msg" in result and result["msg"] and result["msg"] != "All items completed":
             reduced_result["msg"] = result["msg"]
 
-        # Add task vars (those defined specifically at the task level) if there are some
+        # Add task vars (those defined specifically at the task level) if there are some.
         if task.vars:
             reduced_result["task_vars"] = task.vars
 
