@@ -404,9 +404,14 @@ class CallbackModule(CallbackBase):
         if status == 'failed' and self.get_option('show_task_path_on_failure'):
             self._print(f"[rlo.task.log.task_path][italic]task path: {result._task.get_path()}")
 
+    def _get_role_progress(self, role_name):
+        if role_name == "None":
+            return "<none>"
+        return role_name
+
     def _handle_new_task(self, host_name, host_label, task_desc, role_name):
         self._hosts[host_name] = self._progress.add_task(task_desc, total=1, host=host_label)
-        self._role_progress.update(0, description=role_name)
+        self._role_progress.update(0, description=self._get_role_progress(role_name))
 
     def _handle_role(self, role_name):
         if self._current_role != role_name:
