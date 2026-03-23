@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+import curses
 import datetime
 import json
 import os
@@ -133,6 +134,12 @@ def _yaml_dumper_represent_scalar(self, tag, value, style=None):
 
 setattr(MyDumper, 'represent_scalar', _yaml_dumper_represent_scalar)
 
+def get_cnorm():
+    cnorm = curses.tigetstr("cnorm")
+    if cnorm is None:
+        return b"\x1b[?25h"
+    return cnorm
+
 def transform_dict(data, callback):
     if isinstance(data, str):
         return callback(data)
@@ -162,6 +169,10 @@ class CallbackModule(CallbackBase):
     def __init__(self):
         super(CallbackModule, self).__init__()
 
+        # Prepare for __del__
+        self.__DEL_CNORM = get_cnorm().decode("ascii")
+        self.__DEL_STDOUT = sys.__stdout__
+
         # We do not have access to the options values at __init__,
         # so we do the next best possible thing in _transform
         self._transformer_user = None
@@ -176,7 +187,7 @@ class CallbackModule(CallbackBase):
         self._should_print_role = False
         self._start_time = datetime.datetime.now()
 
-        force_interactive = bool(int(os.environ.get('RLO_FORCE_INTERACTIVE', "1")))
+        self._interactive = bool(int(os.environ.get('RLO_FORCE_INTERACTIVE', "1")))
         enable_timer = bool(int(os.environ.get('RLO_ENABLE_TIMER', "1")))
 
         theme = Theme({
@@ -239,11 +250,13 @@ class CallbackModule(CallbackBase):
          auto_refresh=enable_timer,
          console=console)
 
-        if force_interactive:
+        if self._interactive:
             self._live.start()
 
     def __del__(self):
-        pass
+        if self._interactive:
+            self.__DEL_STDOUT.write(self.__DEL_CNORM)
+            self.__DEL_STDOUT.flush()
 
     def v2_playbook_on_play_start(self, play):
         message = f"[bold] - Playbook - {play.get_name()} -[/bold]"
