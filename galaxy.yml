@@ -4,17 +4,18 @@ version: 0.3.0
 readme: ./README.md
 authors:
   - ShinySaana <shinysaana@gmail.com>
-description: Rich Live Output. 
-  A rich stdout callback plugin. 
-  Designed for humans, using modern terminals, 
+description: Rich Live Output.
+  A rich stdout callback plugin.
+  Designed for humans, using modern terminals,
   with a focus on density of useful information.
 repository: https://github.com/ShinySaana/ansible-rich-live-output
 license_file: ./COPYING
 build_ignore:
+  - .ansible
+  - .vscode
+  - ansible.cfg
   - main.yml
   - main.py
-  - ansible.cfg
-  - venv
+  - playbooks
   - requirements.dev.txt
-  - .vscode
-  - .ansible
+  - venv
