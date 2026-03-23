@@ -137,7 +137,7 @@ def transform_dict(data, callback):
     if isinstance(data, str):
         return callback(data)
     elif isinstance(data, dict):
-        return dict([(key, transform_dict(data[key], callback)) for key in data])
+        return dict([(transform_dict(key, callback), transform_dict(data[key], callback)) for key in data])
     elif isinstance(data, tuple):
         return (transform_dict(d, callback) for d in data)
     elif isinstance(data, list):
@@ -349,9 +349,6 @@ class CallbackModule(CallbackBase):
         # The task result is failed, but explicitely not an unreachable
         if status == 'failed':
             return True
-        # The task is a 'debug' action that doesn't define "no_log" to True
-        if result._task.action == 'debug' and not result._task.no_log:
-            return True
 
         return False
 
@@ -361,6 +358,10 @@ class CallbackModule(CallbackBase):
             return True
         # The task succeeded and changed something
         if status == 'ok' and result.is_changed():
+            return True
+
+        # The task is a 'debug' action that doesn't define "no_log" to True
+        if (result._task.action == 'debug' or result._task.action == 'ansible.builtin.debug') and not result._task.no_log:
             return True
 
         return False
