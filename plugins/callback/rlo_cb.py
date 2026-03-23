@@ -243,7 +243,7 @@ class CallbackModule(CallbackBase):
             self._live.start()
 
     def __del__(self):
-        self._live.stop()
+        pass
 
     def v2_playbook_on_play_start(self, play):
         message = f"[bold] - Playbook - {play.get_name()} -[/bold]"
