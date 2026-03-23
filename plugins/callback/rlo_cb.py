@@ -206,12 +206,12 @@ class CallbackModule(CallbackBase):
             "rlo.task.result.skipped": "blue",
 
             "rlo.time": "green",
-            "progress.elapsed": "green",
+            "progress.elapsed": "green italic",
 
             "table.header": "bold",
             "table.footer": "bold",
             "table.cell": "none",
-            "table.title": "italic",
+            "table.title": "bold",
 
             "repr.ipv4": "magenta",
             "repr.ipv6": "magenta",
@@ -232,10 +232,12 @@ class CallbackModule(CallbackBase):
 
         self._role_progress = Progress(
             TextColumn("[bold][italic]{task.description}"),
+            TextColumn("-"),
+            TimeElapsedColumn(),
             transient=True,
             console=console
         )
-        self._role_progress.add_task("None")
+        self._role_progress_task_id = self._role_progress.add_task("None")
 
         self._live = Live(
             Group(
@@ -424,7 +426,7 @@ class CallbackModule(CallbackBase):
 
     def _handle_new_task(self, host_name, host_label, task_desc, role_name):
         self._hosts[host_name] = self._progress.add_task(task_desc, total=1, host=host_label)
-        self._role_progress.update(0, description=self._get_role_progress(role_name))
+        self._role_progress.update(self._role_progress_task_id, description=self._get_role_progress(role_name))
 
     def _handle_role(self, role_name):
         if self._current_role != role_name:
