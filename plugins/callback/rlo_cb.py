@@ -338,19 +338,31 @@ class CallbackModule(CallbackBase):
         message = f"[italic][bold]notified[/bold] - {task_desc} [/italic]"
         self._log(message)
 
+    # We are either asked to display skipped hosts, or the run is verbose enough (-vvv)
+    def _should_log_skipped_task(self, result):
+        return self.get_option('display_skipped_hosts') or self._run_is_verbose(result._result, 2)
+
     def _should_log_task(self, result, status):
         # The run is verbose enough (-vv)
         if self._run_is_verbose(result._result, 1):
             return True
-        # The task is a 'debug' action that doesn't define "no_log" to True
-        if result._task.action == 'debug' and not result._task.no_log:
+
+        # The task is skipped and context allows it to be logged
+        if status == 'skipped' and self._should_log_skipped_task(result):
             return True
+
+        # The task is a 'debug' action that doesn't define "no_log" to True
+        if (result._task.action == 'debug' or result._task.action == 'ansible.builtin.debug') and not result._task.no_log:
+            # The debug task is skipped and context allows it to be logged
+            if status == 'skipped':
+                return _should_log_skipped_task(self, result)
+
+            return True
+
         # The task result is a failure
         if status == 'failed' or status == 'unreachable':
             return True
-        # The task is skipped and we are either asked to display skipped hosts, or the run is verbose enough (-vvv)
-        if status == 'skipped' and (self.get_option('display_skipped_hosts') or self._run_is_verbose(result._result, 2)):
-            return True
+
         # The task is ok, and either the tasked is changed, we are asked to display skipped hosts, or the run is verbose enough (-vvv)
         if status == 'ok' and (result.is_changed() or self.get_option('display_ok_hosts') or self._run_is_verbose(result._result, 2)):
             return True
@@ -361,6 +373,7 @@ class CallbackModule(CallbackBase):
         # The run is verbose enough (-vvvv)
         if self._run_is_verbose(result._result, 3):
             return True
+
         # The task result is failed, but explicitely not an unreachable
         if status == 'failed':
             return True
