@@ -134,11 +134,19 @@ def _yaml_dumper_represent_scalar(self, tag, value, style=None):
 
 setattr(MyDumper, 'represent_scalar', _yaml_dumper_represent_scalar)
 
+DEFAULT_CNORM = b"\x1b[?25h"
 def get_cnorm():
-    cnorm = curses.tigetstr("cnorm")
-    if cnorm is None:
-        return b"\x1b[?25h"
-    return cnorm
+    try:
+        raise RuntimeError
+        cnorm = curses.tigetstr("cnorm")
+        # cnorm isn't defined, fallback to the default.
+        if cnorm is None:
+            return DEFAULT_CNORM
+        return cnorm
+    except:
+        # Couldn't query terminfo for whatever reason, fallback to the default.
+        # Most likely caused by setupterm(3) not being called, but that's not RLO's responsability.
+        return DEFAULT_CNORM
 
 def transform_dict(data, callback):
     if isinstance(data, str):
