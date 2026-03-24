@@ -355,7 +355,7 @@ class CallbackModule(CallbackBase):
         if (result._task.action == 'debug' or result._task.action == 'ansible.builtin.debug') and not result._task.no_log:
             # The debug task is skipped and context allows it to be logged
             if status == 'skipped':
-                return self._should_log_skipped_task(self, result)
+                return self._should_log_skipped_task(result)
 
             return True
 
